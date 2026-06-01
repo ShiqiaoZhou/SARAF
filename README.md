@@ -1,7 +1,10 @@
-# Stationarity-Aware Retrieval-Augmented Time Series Forecasting
+# Stationarity-Aware Retrieval-Augmented Time Series Forecasting (KDD'26)
 
-This is the official PyTorch implementation of **SARAF**. SARAF is a frame-
-work that adaptively balances relevance and diversity in retrieval based on dataset stationarity.
+This repository provides the official PyTorch implementation of the KDD 2026 paper, **Stationarity-Aware Retrieval-Augmented Time Series Forecasting** (SARAF). SARAF is a retrieval-augmented forecasting framework that adaptively balances retrieval relevance and diversity according to dataset stationarity.
+
+<p align="center">
+  <img src="fig/SARAF.png" alt="Overview of the SARAF framework" width="85%">
+</p>
 
 ---
 

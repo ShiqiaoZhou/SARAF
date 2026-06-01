@@ -172,8 +172,6 @@ class RetrievalTool():
         # Normalize using global statistics.
         global_std = data.std(dim=1).mean(dim=1)  # [N] global standard deviation
         
-        # Stationarity score: smaller variation means more stationarity.
-        # Use the form 1 - (variation/global) and clamp to [0, 1].
         mean_score = 1.0 - (mean_variation / (global_std + 1e-8)).clamp(0, 1)
         std_score = 1.0 - (std_variation / (global_std + 1e-8)).clamp(0, 1)
         
@@ -197,23 +195,6 @@ class RetrievalTool():
         """
         N = data.shape[0]
         
-        # # Compute the number of samples：max(200, 5% of training-set samples)
-        # n_samples = max(min_samples, int(N * sample_ratio))
-        # n_samples = min(n_samples, N)  # must not exceed the total number of samples
-        
-        # # Uniformly sample to cover different window positions.
-        # # Use evenly spaced sampling instead of random sampling to avoid clustering.
-        # step = N / n_samples
-        # sample_indices = [int(i * step) for i in range(n_samples)]
-        # sample_indices = torch.tensor(sample_indices, dtype=torch.long)
-        
-        # # Ensure indices stay in range.
-        # sample_indices = sample_indices.clamp(0, N - 1)
-        
-        # # Extract sampled data.
-        # sampled_data = data[sample_indices]  # [n_samples, seq_len, channels]
-
-
         # Use all samples to compute stationarity; sampling is disabled.
         n_samples = N
         
@@ -260,16 +241,6 @@ class RetrievalTool():
         sigma = self.sigma_min + (1.0 - dataset_stationarity) * (self.sigma_max - self.sigma_min)
         lambda_val = self.lambda_min + dataset_stationarity * (self.lambda_max - self.lambda_min)
 
-        # s = torch.sigmoid(torch.tensor([(dataset_stationarity - 0.5) * 10.0]))  # Higher stationarity makes s closer to 1.
-        # sigma = self.sigma_min + (1.0 - s.item()) * (self.sigma_max - self.sigma_min)
-        # lambda_val = self.lambda_min + s.item() * (self.lambda_max - self.lambda_min)
-        # print(f"  s(sigmoid dataset_stationarity): {s.item():.4f}")
-
-        # horizon_ratio = self.pred_len / self.seq_len
-        # horizon_factor = 1.0 / (1.0 + 0.5 * horizon_ratio)
-        # lambda_val = lambda_val * horizon_factor
-        # sigma = sigma / horizon_factor
-        # sigma = sigma  # Do not adjust sigma.
         print(f"  Adaptive parameters:")
         print(f"    - σ (temperature): {sigma:.4f} (range: [{self.sigma_min}, {self.sigma_max}])")
         print(f"    - λ (MMR balance): {lambda_val:.4f} (range: [{self.lambda_min}, {self.lambda_max}])")
@@ -285,11 +256,7 @@ class RetrievalTool():
         - Non-stationary (s -> 0): sigma -> sigma_max, smoother weights and more risk spreading.
         
         """
-        # base_sigma = self.sigma_min + (1.0 - stationarity) * (self.sigma_max - self.sigma_min)
-        # horizon_ratio = self.pred_len / self.seq_len
-        # horizon_factor = 1.0 / (1.0 + 0.5 * horizon_ratio)
 
-        # return base_sigma / horizon_factor
         return self.sigma_min + (1.0 - stationarity) * (self.sigma_max - self.sigma_min)
     
     def compute_adaptive_lambda(self, stationarity):
@@ -299,15 +266,6 @@ class RetrievalTool():
         - Stationary (s -> 1): lambda -> lambda_max, closer to standard TopK.
         - Non-stationary (s -> 0): lambda -> lambda_min, more diverse.
         """
-
-        # base_lambda = self.lambda_min + stationarity * (self.lambda_max - self.lambda_min)
-        
-        # # Compute the horizon adjustment factor.
-        # horizon_ratio = self.pred_len / self.seq_len
-        # horizon_factor = 1.0 / (1.0 + 0.5 * horizon_ratio)
-        
-        # # Adjust lambda with horizon_factor; larger horizons use smaller lambda and higher diversity.
-        # return base_lambda * horizon_factor
 
         return self.lambda_min + stationarity * (self.lambda_max - self.lambda_min)
     
@@ -349,11 +307,6 @@ class RetrievalTool():
         candidate_idx = topM.indices  # [M]
         candidate_sim = topM.values   # [M] similarity between candidate samples and the query
         
-        # Print the top 20 candidates before stochastic MMR selection.
-        # print(f"\n[Stochastic MMR Before] Top-{min(k, 20)} from candidate pool:")
-        # print(f"  Indices: {candidate_idx[:min(k, 20)].cpu().tolist()}")
-        # print(f"  Similarity: {candidate_sim[:min(k, 20)].cpu().tolist()}")
-        
         # Precompute similarity between candidate samples using closeness of similarity values as a proxy.
         candidate_sim_matrix = 1.0 - torch.abs(
             candidate_sim.unsqueeze(0) - candidate_sim.unsqueeze(1)
@@ -394,23 +347,6 @@ class RetrievalTool():
         # Convert back to original indices.
         selected_idx = candidate_idx[torch.tensor(selected, device=device)]
         
-        # Print results after stochastic MMR selection.
-        # print(f"\n[Stochastic MMR After] Selected {len(selected_idx)} samples:")
-        # print(f"  Indices: {selected_idx.cpu().tolist()}")
-        # print(f"  Original ranks in candidate pool: {selected}")
-        # print(f"  Temperature used: {temperature:.4f}")
-        
-        # # Compare with the indices that direct TopK would select.
-        # if k <= candidate_pool_size:
-        #     topk_indices = candidate_idx[:k]
-        #     num_different = (selected_idx != topk_indices).sum().item()
-        #     print(f"\n[Stochastic MMR vs TopK] Difference: {num_different}/{k} samples changed ({num_different/k*100:.1f}%)")
-        #     if num_different > 0:
-        #         print(f"  TopK would select: {topk_indices.cpu().tolist()}")
-        #         # Find positions that differ.
-        #         diff_positions = (selected_idx != topk_indices).nonzero(as_tuple=True)[0].cpu().tolist()
-        #         print(f"  Different at positions: {diff_positions}")
-        
         return selected_idx
 
     def decompose_mg(self, data_all, remove_offset=True): #decompose time-series data into components with different period lengths
@@ -432,9 +368,6 @@ class RetrievalTool():
                 cur_offset = data_p[:,-1:,:]
                 mg[i] = data_p - cur_offset # subtract the final time-step feature from every time step to obtain relative offsets
                 
-                # Alternative code: subtract the mean value as the offset
-                # cur_offset = data_p.mean(dim=1, keepdim=True)  # compute each sample mean along the time dimension [T, 1, C]
-                # mg[i] = data_p - cur_offset  # subtract the mean from each time-step feature to obtain relative values
                 offset.append(cur_offset)
             offset = torch.stack(offset, dim=0)
         else:
