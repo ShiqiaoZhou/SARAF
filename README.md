@@ -1,6 +1,6 @@
 # Stationarity-Aware Retrieval-Augmented Time Series Forecasting (KDD'26)
 
-This repository provides the official PyTorch implementation of the KDD 2026 paper, **Stationarity-Aware Retrieval-Augmented Time Series Forecasting** (SARAF). SARAF is a retrieval-augmented forecasting framework that adaptively balances retrieval relevance and diversity according to dataset stationarity.
+This repository provides the official PyTorch implementation of the KDD 2026 paper, **Stationarity-Aware Retrieval-Augmented Time Series Forecasting** ([SARAF](https://arxiv.org/abs/2606.04135)). SARAF is a retrieval-augmented forecasting framework that adaptively balances retrieval relevance and diversity according to dataset stationarity.
 
 <p align="center">
   <img src="fig/SARAF.png" alt="Overview of the SARAF framework" width="85%">
@@ -36,7 +36,7 @@ mkdir -p ./data
 We provide per-dataset bash scripts under `./scripts/`. Each script runs experiments across multiple prediction lengths and random seeds.
 
 ```bash
-# ETTh1 (seq_len=720)
+# ETTh+ETTm (seq_len=720)
 bash scripts/ETTh_720.sh
 
 # Electricity
