@@ -86,10 +86,15 @@ This code is based on [RAFT](https://arxiv.org/abs/2505.04163) and [Time-Series-
 If you find this repository useful for your research, please consider citing our paper:
 
 ```bibtex
-@misc{zhou2026saraf,
-  title         = {Stationarity-Aware Retrieval-Augmented Time Series Forecasting},
-  author        = {Zhou, Shiqiao and Sch{\"o}ner, Holger and Wu, Zipeng and Fouch{\'e}, Edouard and Wilson, IAG and Wang, Shuo},
-  year          = {2026},
-  doi           = {10.48550/arXiv.2606.04135},
-  url           = {https://arxiv.org/abs/2606.04135}
+@inproceedings{zhou2026saraf,
+  title     = {Stationarity-Aware Retrieval-Augmented Time Series Forecasting},
+  author    = {Zhou, Shiqiao and Sch{\"o}ner, Holger and Wu, Zipeng and Fouch{\'e}, Edouard and Wilson, IAG and Wang, Shuo},
+  booktitle = {Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2},
+  series    = {KDD '26},
+  pages     = {6875--6886},
+  year      = {2026},
+  publisher = {Association for Computing Machinery},
+  doi       = {10.1145/3770855.3817813},
+  url       = {https://doi.org/10.1145/3770855.3817813}
 }
+```
