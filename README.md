@@ -1,5 +1,8 @@
 # Stationarity-Aware Retrieval-Augmented Time Series Forecasting (KDD'26)
-[![arXiv](https://img.shields.io/badge/arXiv-2606.04135-b31b1b.svg)](https://arxiv.org/abs/2606.04135)
+
+[![KDD'26](https://img.shields.io/badge/KDD'26-Paper-0085CA.svg?logo=acm&logoColor=white)](https://dl.acm.org/doi/abs/10.1145/3770855.3817813)
+[![arXiv](https://img.shields.io/badge/arXiv-2606.04135-b31b1b.svg?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2606.04135)
+[![WeChat](https://img.shields.io/badge/微信公众号-中文解读-07C160.svg?logo=wechat&logoColor=white)](https://mp.weixin.qq.com/s/ngnthZQorRhO69TIH5qT1Q)
 
 This repository provides the official implementation of [**SARAF**](https://arxiv.org/abs/2606.04135), accepted by KDD 2026. 
 
